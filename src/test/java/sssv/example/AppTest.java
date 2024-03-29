@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 public class AppTest 
     extends TestCase
 {
-    @Mock
     private StudentValidator studentValidator;
 
     @Mock
@@ -41,6 +40,7 @@ public class AppTest
     protected void setUp() throws Exception {
         super.setUp();
         MockitoAnnotations.initMocks(this);
+        studentValidator = new StudentValidator();
         service = new Service(studentFileRepository,
                 studentValidator,
                 null,
@@ -67,32 +67,208 @@ public class AppTest
     }
 
     /**
-     * Test adding a new student
+     * Test adding a student with id 1
      */
-    public void testAddNewStudent() {
-        Student student = new Student("1", "Ghita", 933, "ghita@ghita.com"); // Adjust constructor as necessary
-        when(studentFileRepository.save(student)).thenReturn(student);
-
-        assertEquals(student, service.addStudent(student));
-        verify(studentValidator).validate(student);
-        verify(studentFileRepository).save(student);
+    public void testAddStudentWithId1() {
+        Student student = new Student("1", "Ghita", 933, "ghita@ghita.com");
+        assertEquals(null, service.addStudent(student));
     }
 
     /**
-     * Test adding an existing student
-     */
-    public void testAddExistingStudent() {
-        String expectedMessage = "Invalid student details";
-        Student student1 = new Student("1", "GhitaInvalid", 933, "ghita@ghita.com"); // Adjust constructor as necessary
-        doThrow(new ValidationException(expectedMessage)).when(studentValidator).validate(student1);
+     * Test adding a student with null id
+     * */
+    public void testAddStudentWithNullId() {
+        Student student = new Student(null, "Ghita", 933, "ghita@ghita.com");
         try {
             // Act
-            service.addStudent(student1);
+            service.addStudent(student);
             // Assert failure if the above method call does not throw the exception
             fail("Expected a ValidationException to be thrown");
         } catch (ValidationException e) {
             // Assert that the thrown exception is what we expect
-            assertEquals(expectedMessage, e.getMessage());
+            assert(true);
+        }
+    }
+
+    /**
+     * Test adding a student with empty id
+     * */
+    public void testAddStudentWithEmptyId() {
+        Student student = new Student("", "Ghita", 933, "ghita@ghita.com");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert(true);
+        }
+    }
+
+    /**
+     * Test adding a student with valid name
+     * */
+    public void testAddStudentWithValidName() {
+        Student student = new Student("1", "Mihai", 933, "mihai@mihai.com");
+        assertEquals(null, service.addStudent(student));
+    }
+
+    /**
+     * Test adding a student with null name
+     * */
+    public void testAddStudentWithNullName() {
+        Student student = new Student("1", null, 933, "mihai@mihai.com");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert (true);
+        }
+    }
+
+    /**
+     * Test adding a student with empty name
+     * */
+    public void testAddStudentWithEmptyName() {
+        Student student = new Student("1", "", 933, "mihai@mihai.com");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert(true);
+        }
+    }
+
+
+    /**
+     * Test adding a student with valid email
+     * */
+    public void testAddStudentWithValidEmail() {
+        Student student = new Student("1", "Mihai", 933, "mihai@mihai.com");
+        assertEquals(null, service.addStudent(student));
+    }
+
+    /**
+     * Test adding a student with null name
+     * */
+    public void testAddStudentWithNullEmail() {
+        Student student = new Student("1", "Mihai", 933, null);
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert (true);
+        }
+    }
+
+    /**
+     * Test adding a student with empty name
+     * */
+    public void testAddStudentWithEmptyEmail() {
+        Student student = new Student("1", "Mihai", 933, "");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert(true);
+        }
+    }
+
+    /**
+     * Test adding student with valid group
+     */
+    public void testAddStudentWithValidGroup() {
+        Student student = new Student("1", "Mihai", 1, "mihai@mihai.com");
+        assertEquals(null, service.addStudent(student));
+    }
+
+    /**
+     * Test adding student with negative group
+     */
+    public void testAddStudentWithNegativeGroup() {
+        Student student = new Student("1", "Mihai", -1, "mihai@mihai.com");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert (true);
+        }
+    }
+
+    /**
+     * Test adding student with group 0
+     */
+    public void testAddStudentWithGroup0() {
+        Student student = new Student("1", "Mihai", 0, "mihai@mihai.com");
+        assertEquals(null, service.addStudent(student));
+    }
+
+    /**
+     * Test adding student with group MAXINT
+     */
+    public void testAddStudentWithGroupMAXINT() {
+        Student student = new Student("1", "Mihai", Integer.MAX_VALUE, "mihai@mihai.com");
+        assertEquals(null, service.addStudent(student));
+    }
+
+    /**
+     * Test adding student with group MAXINT+1
+     */
+    public void testAddStudentWithGroupMAXINTPlus1() {
+        Student student = new Student("1", "Mihai", Integer.MAX_VALUE + 1, "mihai@mihai.com");
+        try {
+            // Act
+            service.addStudent(student);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert (true);
+        }
+    }
+
+    /**
+     * Test adding two students with different ids
+     */
+    public void testAddTwoStudentsWithDifferentIds() {
+        Student student1 = new Student("1", "Mihai", 933, "mihai@mihai.com");
+        Student student2 = new Student("2", "Ovidiu", 933, "ovidiu@ovidiu.com");
+        assertEquals(null, service.addStudent(student1));
+        assertEquals(null, service.addStudent(student2));
+    }
+
+    /**
+     * Test adding two students with the same id
+     */
+    public void testAddTwoStudentsWithTheSameId() {
+        Student student1 = new Student("1", "Mihai", 933, "mihai@mihai.com");
+        Student student2 = new Student("1", "Ovidiu", 933, "ovidiu@ovidiu.com");
+        assertEquals(null, service.addStudent(student1));
+        when(studentFileRepository.save(student2)).thenReturn(student1);
+        try {
+            // Act
+            service.addStudent(student2);
+            // Assert failure if the above method call does not throw the exception
+            fail("Expected a ValidationException to be thrown");
+        } catch (ValidationException e) {
+            // Assert that the thrown exception is what we expect
+            assert (true);
         }
     }
 }

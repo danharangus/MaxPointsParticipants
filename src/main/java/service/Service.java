@@ -59,7 +59,11 @@ public class Service {
      */
     public Student addStudent(Student student) {
         studentValidator.validate(student);
-        return studentFileRepository.save(student);
+        var result = studentFileRepository.save(student);
+        if (result != null) {
+            throw new ValidationException("Studentul exista deja!");
+        }
+        return null;
     }
 
     /**
