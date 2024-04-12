@@ -21,6 +21,11 @@ public class WhiteBoxTests extends TestCase {
 
     public static Service service;
 
+    public WhiteBoxTests( String testName )
+    {
+        super( testName );
+    }
+
     @BeforeAll
     public static void setup() {
         StudentValidator studentValidator = new StudentValidator();

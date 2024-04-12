@@ -40,6 +40,16 @@ public class BBITests extends TestCase {
 
     private Service service;
 
+    /**
+     * Create the test case
+     *
+     * @param testName name of the test case
+     */
+    public BBITests( String testName )
+    {
+        super( testName );
+    }
+
     @BeforeEach
     public void setup() {
         studentValidator = mock(StudentValidator.class);
