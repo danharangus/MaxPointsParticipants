@@ -4,6 +4,7 @@ import domain.Nota;
 import domain.Student;
 import domain.Tema;
 import junit.framework.Assert;
+import junit.framework.TestCase;
 import repository.NotaXMLRepo;
 import repository.StudentXMLRepo;
 import repository.TemaXMLRepo;
@@ -18,7 +19,7 @@ import org.mockito.Mock;
 import java.time.LocalDate;
 import static org.mockito.Mockito.*;
 
-public class BBITests {
+public class BBITests extends TestCase {
     @Mock
     private StudentValidator studentValidator;
 

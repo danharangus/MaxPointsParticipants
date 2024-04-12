@@ -2,6 +2,7 @@ package sssv.example;
 
 import domain.Student;
 import domain.Tema;
+import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ import validation.ValidationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class WhiteBoxTests {
+public class WhiteBoxTests extends TestCase {
 
     public static Service service;
 
