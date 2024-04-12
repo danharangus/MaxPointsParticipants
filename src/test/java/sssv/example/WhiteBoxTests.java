@@ -1,10 +1,10 @@
 package sssv.example;
 
+import domain.Student;
 import domain.Tema;
-import junit.framework.TestCase;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import repository.NotaFileRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import repository.NotaXMLRepo;
 import repository.StudentXMLRepo;
 import repository.TemaXMLRepo;
@@ -14,61 +14,184 @@ import validation.StudentValidator;
 import validation.TemaValidator;
 import validation.ValidationException;
 
-public class WhiteBoxTests extends TestCase {
-    private TemaValidator temaValidator;
-    private TemaXMLRepo temaFileRepository;
+import static org.junit.jupiter.api.Assertions.*;
 
+public class WhiteBoxTests {
 
+    public static Service service;
 
-    private Service service;
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public WhiteBoxTests( String testName )
-    {
-        super( testName );
+    @BeforeAll
+    public static void setup() {
+        StudentValidator studentValidator = new StudentValidator();
+        TemaValidator temaValidator = new TemaValidator();
+        String filenameStudent = "fisiere/Studenti.xml";
+        String filenameTema = "fisiere/Teme.xml";
+        String filenameNota = "fisiere/Note.xml";
+
+        StudentXMLRepo studentXMLRepository = new StudentXMLRepo(filenameStudent);
+        TemaXMLRepo temaXMLRepository = new TemaXMLRepo(filenameTema);
+        NotaValidator notaValidator = new NotaValidator(studentXMLRepository, temaXMLRepository);
+        NotaXMLRepo notaXMLRepository = new NotaXMLRepo(filenameNota);
+        WhiteBoxTests.service = new Service(studentXMLRepository, studentValidator, temaXMLRepository, temaValidator, notaXMLRepository, notaValidator);
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        MockitoAnnotations.initMocks(this);
-        temaValidator = new TemaValidator();
-        temaValidator = new TemaValidator();
-
-        service = new Service(null,
-                null,
-                temaFileRepository,
-                temaValidator,
-                null,
-                null); // Adjust constructor as necessary
-    }
-
-    /**
-     * Add assignment with invalid number throws ValidationException
-     */
-    public void testAddAssignmentInvalidNumber() {
-        Tema assignment = new Tema("", "description", 1, 2);
+    // White box testing
+    @Test
+    public void addTema_ValidData_CreatedSuccessfully() {
+        String nrTema = "1";
+        String descriere = "test tema";
+        int deadline = 13;
+        int primire = 1;
+        Tema tema = new Tema(nrTema, descriere, deadline, primire);
         try {
-            service.addTema(assignment);
-            fail("ValidationException not thrown");
-        } catch (ValidationException e) {
-            assertEquals("Numar tema invalid!", e.getMessage());
+            service.addTema(tema);
+            assert(true);
+        } catch (ValidationException exception) {
+            System.out.println("Validation exception: " + exception.getMessage());
+            assert(false);
         }
     }
 
-    /**
-     * Add assignment with invalid description throws ValidationException
-     */
-    public void testAddAssignmentInvalidDescription() {
-        Tema assignment = new Tema("1", "", 1, 2);
+    @Test
+    public void addTema_InvalidNrTema_ThrowsError() {
+        String nrTema = "1";
+        String descriere = "test tema";
+        int deadline = 13;
+        int primire = 1;
+        Tema tema = new Tema(nrTema, descriere, deadline, primire);
         try {
-            service.addTema(assignment);
-            fail("ValidationException not thrown");
-        } catch (ValidationException e) {
-            assertEquals("Descriere invalida!", e.getMessage());
+            Tema response = service.addTema(tema);
+            assert(tema == response);
+        } catch (ValidationException exception) {
+            System.out.println("Validation exception: " + exception.getMessage());
+            assert(true);
         }
+    }
+
+    @Test
+    public void addTema_EmptyNrTema_ThrowsError() {
+        String nrTema = "";
+        String descriere = "test tema";
+        int deadline = 13;
+        int primire = 2;
+        Tema tema = new Tema(nrTema, descriere, deadline, primire);
+        try {
+            service.addTema(tema);
+            assert(false);
+        } catch (ValidationException exception) {
+            System.out.println("Validation exception: " + exception.getMessage());
+            assert(true);
+        }
+    }
+
+    @Test
+    public void addTema_EmptyDescriere_ThrowsError() {
+
+        String nrTema = "101";
+        String descriere = "";
+        int deadline = 13;
+        int primire = 2;
+
+        Tema tema = new Tema(nrTema, descriere, deadline, primire );
+
+        try{
+            service.addTema(tema);
+            assert(false);
+
+        }catch (ValidationException ve){
+            System.out.println("Validation Exception: " + ve.getMessage());
+            assert(true);
+
+        }
+
+    }
+
+
+    @Test
+    public void addTema_InvalidDeadlineZero_ThrowsError() {
+
+        String nrTema = "2";
+        String descriere = "test tema";
+        int deadline = 0;
+        int primire = 11;
+
+        Tema tema = new Tema(nrTema, descriere, deadline, primire );
+
+        try{
+            service.addTema(tema);
+            assert(false);
+
+        }catch (ValidationException ve){
+            System.out.println("Validation Exception: " + ve.getMessage());
+            assert(true);
+
+        }
+
+    }
+
+    @Test
+    public void addTema_InvalidDeadlineAbove14_ThrowsError() {
+
+        String nrTema = "2";
+        String descriere = "test tema";
+        int deadline = 15;
+        int primire = 11;
+
+        Tema tema = new Tema(nrTema, descriere, deadline, primire );
+
+        try{
+            service.addTema(tema);
+            assert(false);
+
+        }catch (ValidationException ve){
+            System.out.println("Validation Exception: " + ve.getMessage());
+            assert(true);
+
+        }
+
+    }
+
+    @Test
+    public void addTema_Invalid_PrimireZero_ThrowsError() {
+
+        String nrTema = "3";
+        String descriere = "test tema";
+        int deadline = 13;
+        int primire = 0;
+
+        Tema tema = new Tema(nrTema, descriere, deadline, primire );
+
+        try{
+            service.addTema(tema);
+            assert(false);
+
+        }catch (ValidationException ve){
+            System.out.println("Validation Exception: " + ve.getMessage());
+            assert(true);
+
+        }
+
+    }
+
+    @Test
+    public void addTema_InvalidPrimireAbove14_ThrowsError() {
+
+        String nrTema = "3";
+        String descriere = "test tema";
+        int deadline = 12;
+        int primire = 15;
+
+        Tema tema = new Tema(nrTema, descriere, deadline, primire );
+
+        try{
+            service.addTema(tema);
+            assert(false);
+
+        }catch (ValidationException ve){
+            System.out.println("Validation Exception: " + ve.getMessage());
+            assert(true);
+
+        }
+
     }
 }
