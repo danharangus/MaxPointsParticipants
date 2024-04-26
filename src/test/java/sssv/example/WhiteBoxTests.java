@@ -15,6 +15,7 @@ import validation.StudentValidator;
 import validation.TemaValidator;
 import validation.ValidationException;
 
+import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WhiteBoxTests extends TestCase {
@@ -26,8 +27,8 @@ public class WhiteBoxTests extends TestCase {
         super( testName );
     }
 
-    @BeforeAll
-    public static void setup() {
+    @BeforeEach
+    public void setup() throws Exception {
         StudentValidator studentValidator = new StudentValidator();
         TemaValidator temaValidator = new TemaValidator();
         String filenameStudent = "fisiere/Studenti.xml";

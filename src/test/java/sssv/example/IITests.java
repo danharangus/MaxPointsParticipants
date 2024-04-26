@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import java.time.LocalDate;
 import static org.mockito.Mockito.*;
 
-public class BBITests extends TestCase {
+public class IITests extends TestCase {
     @Mock
     private StudentValidator studentValidator;
 
@@ -64,14 +64,27 @@ public class BBITests extends TestCase {
     }
 
     @Test
-    public void addStudent_Valid_StudentIsAdded(){
+    public void addStudent_Valid_StudentIsAdded() {
         Student testStudent = new Student("1", "Test Student", 933, "test_email@email.ro");
         try {
-            service.addStudent(testStudent);
+            when(studentXMLRepository.save(testStudent)).thenReturn(null);
+            Student addedStudent = service.addStudent(testStudent);
+            Assertions.assertNull(addedStudent);  // Assuming save returns null on success
         } catch (Exception e) {
-            Assertions.fail();
+            Assertions.fail("Exception should not be thrown");
         }
-        service.deleteStudent("1");
+    }
+
+    @Test
+    public void addTema_Valid_TemaIsAdded() {
+        Tema testTema = new Tema("1", "Test Tema", 1, 10);
+        try {
+            when(temaXMLRepository.save(testTema)).thenReturn(null);
+            Tema addedTema = service.addTema(testTema);
+            Assertions.assertNull(addedTema);
+        } catch (Exception e) {
+            Assertions.fail("Exception should not be thrown");
+        }
     }
 
     @Test
@@ -80,63 +93,59 @@ public class BBITests extends TestCase {
         try {
             when(studentXMLRepository.findOne("1")).thenReturn(new Student("1", "Test Student", 933, "test"));
             when(temaXMLRepository.findOne("1")).thenReturn(new Tema("1", "Test Tema", 6, 10));
-            service.addNota(testNota, "feedback");
+            when(notaXMLRepository.save(testNota)).thenReturn(null);
+            double addedNota = service.addNota(testNota, "feedback");
+            Assertions.assertEquals(addedNota, testNota.getNota());
         } catch (Exception e) {
-            e.printStackTrace();
-            Assertions.fail();
+            Assertions.fail("Exception should not be thrown");
         }
-        service.deleteNota("1");
+    }
+
+
+    @Test
+    public void addStudentAndTema_BothAddedCorrectly() {
+        Student student = new Student("2", "New Student", 921, "new_email@email.com");
+        Tema tema = new Tema("2", "New Tema", 3, 12);
+
+        try {
+            // Mocking student addition
+            when(studentXMLRepository.save(student)).thenReturn(null);
+            Student addedStudent = service.addStudent(student);
+            Assertions.assertNull(addedStudent);
+
+            // Mocking tema addition
+            when(temaXMLRepository.save(tema)).thenReturn(null);
+            Tema addedTema = service.addTema(tema);
+            Assertions.assertNull(addedTema);
+        } catch (Exception e) {
+            Assertions.fail("Exception should not be thrown");
+        }
     }
 
     @Test
-    public void addTema_Valid_TemaIsAdded() {
-        Tema testTema = new Tema("1", "Test Tema", 1, 10);
-        try {
-            service.addTema(testTema);
-        } catch (Exception e) {
-            Assertions.fail();
-        }
-        service.deleteTema("1");
-    }
-
-    @Test
-    public void addStudent_Valid_addTema_Valid_addNota_Valid_ThrowsException() {
-        String studentId = "1";
-        String nume = "Dan";
-        int grupa = 933;
-        String email = "dan@yahoo.com";
-        Student student = new Student(studentId, nume, grupa, email);
-
-        String nrTema = "1";
-        String descriere = "descriere";
-        int deadline = 6;
-        int primire = 2;
-        Tema tema = new Tema(nrTema, descriere, deadline, primire);
-
-        String notaId = "nt1";
-        double notaVal = 9.5;
-        LocalDate date = LocalDate.of(2021, 10, 10);
-        Nota nota = new Nota(notaId, studentId, nrTema, notaVal, date);
+    public void complexScenarioIntegrationTest() {
+        Student student = new Student("3", "Dan", 933, "dan@yahoo.com");
+        Tema tema = new Tema("3", "Detailed Description", 6, 2);
+        Nota nota = new Nota("nt2", "3", "3", 9.5, LocalDate.of(2021, 10, 10));
 
         try {
+            // Validate and add student
             doNothing().when(studentValidator).validate(student);
             when(studentXMLRepository.save(student)).thenReturn(null);
+            Assertions.assertNull(service.addStudent(student));
 
+            // Validate and add tema
             doNothing().when(temaValidator).validate(tema);
             when(temaXMLRepository.save(tema)).thenReturn(null);
+            Assertions.assertNull(service.addTema(tema));
 
-            when(studentXMLRepository.findOne(studentId)).thenReturn(student);
-            when(temaXMLRepository.findOne(nrTema)).thenReturn(tema);
-
-            Student returnedStudent = service.addStudent(student);
-            Assertions.assertNull(returnedStudent);
-
-            Tema returnedTema = service.addTema(tema);
-            Assertions.assertNull(returnedTema);
-
+            // Expecting a failure when adding nota
+            when(studentXMLRepository.findOne("3")).thenReturn(student);
+            when(temaXMLRepository.findOne("3")).thenReturn(tema);
             Assertions.assertThrows(ValidationException.class, () -> service.addNota(nota, "feedback"));
         } catch (ValidationException ve) {
-            ve.printStackTrace();
+            Assertions.fail("ValidationException should not have been thrown here");
         }
     }
+
 }
